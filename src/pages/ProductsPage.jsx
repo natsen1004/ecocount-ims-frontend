@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import AddProductForm from '../components/AddProductForm';
-import RemoveProductForm from '../components/RemoveProductForm';
-import ProductList from '../components/ProductList';
+import AddProductForm from '../components/feature/AddProductForm';
+import RemoveProductForm from '../components/feature/RemoveProductForm';
+import ProductList from '../components/feature/ProductList';
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
