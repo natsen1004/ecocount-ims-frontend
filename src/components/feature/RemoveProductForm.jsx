@@ -1,5 +1,6 @@
-import PropTypes from "prop-types";
-import { useState } from "react";
+import PropTypes from 'prop-types';
+import { useState } from 'react';
+import '../../styles/ProductForms.css';
 
 const RemoveProductForm = ({ products, removeProduct, loading }) => {
   const [selectedProductId, setSelectedProductId] = useState("");

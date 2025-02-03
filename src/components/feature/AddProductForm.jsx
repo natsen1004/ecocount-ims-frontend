@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
+import '../../styles/ProductForms.css';
 
 const AddProductForm = ({ addProduct, loading }) => {
   const [name, setName] = useState("");
@@ -10,12 +11,21 @@ const AddProductForm = ({ addProduct, loading }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (!name.trim()) {
       alert("Product name is required.");
       return;
     }
 
-    const productData = { name, sku, quantity, reorder_level: reorderLevel, price };
+    const productData = {
+      name: name.trim(),
+      sku: sku.trim(),
+      quantity: isNaN(quantity) ? 0 : quantity, 
+      reorder_level: isNaN(reorderLevel) ? 0 : reorderLevel, 
+      price: isNaN(price) ? 0.0 : price, 
+    };
+
+    console.log("Submitting Product Data:", productData); 
     addProduct(productData);
 
     setName("");
@@ -26,10 +36,10 @@ const AddProductForm = ({ addProduct, loading }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="form-container">
       <h2>Add Product</h2>
 
-      <div>
+      <div className="form-group">
         <label htmlFor="name">Name:</label>
         <input
           type="text"
@@ -40,7 +50,7 @@ const AddProductForm = ({ addProduct, loading }) => {
         />
       </div>
 
-      <div>
+      <div className="form-group">
         <label htmlFor="sku">SKU:</label>
         <input
           type="text"
@@ -50,35 +60,35 @@ const AddProductForm = ({ addProduct, loading }) => {
         />
       </div>
 
-      <div>
+      <div className="form-group">
         <label htmlFor="quantity">Quantity:</label>
         <input
           type="number"
           id="quantity"
           value={quantity}
-          onChange={(e) => setQuantity(parseInt(e.target.value))}
+          onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
           min="0"
         />
       </div>
 
-      <div>
+      <div className="form-group">
         <label htmlFor="reorderLevel">Reorder Level:</label>
         <input
           type="number"
           id="reorderLevel"
           value={reorderLevel}
-          onChange={(e) => setReorderLevel(parseInt(e.target.value))}
+          onChange={(e) => setReorderLevel(parseInt(e.target.value) || 0)}
           min="0"
         />
       </div>
 
-      <div>
+      <div className="form-group">
         <label htmlFor="price">Price:</label>
         <input
           type="number"
           id="price"
           value={price}
-          onChange={(e) => setPrice(parseFloat(e.target.value))}
+          onChange={(e) => setPrice(parseFloat(e.target.value) || 0.0)}
           step="0.01"
           min="0"
         />
@@ -97,3 +107,4 @@ AddProductForm.propTypes = {
 };
 
 export default AddProductForm;
+

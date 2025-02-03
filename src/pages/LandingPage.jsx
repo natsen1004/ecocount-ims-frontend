@@ -1,16 +1,34 @@
-import LoginForm from '../components/auth/LoginForm'; 
-
+import LoginForm from "../components/auth/LoginForm";
+import '../styles/LandingPage.css';
 const LandingPage = () => {
   return (
-    <div>
-      <main>
-        <h1>Welcome to EcoCount IMS</h1>
-        <p>Your one-stop solution for inventory management and sustainability tracking.</p>
-
-        <LoginForm />
-      </main>
+    <div className="landing-container">
+      <div className="content-wrapper">
+        <div className="left-side">
+          <div className="description">
+            <div className="logo-container">
+              {/* <img src={logo} alt="EcoCount Logo" className="logo" /> */}
+              <h1>EcoCount IMS</h1>
+            </div>
+            <h2>Manage Your Inventory Efficiently</h2>
+            <p>
+              Stay organized, optimize stock levels, and ensure sustainability with
+              our intuitive platform.
+            </p>
+          </div>
+        </div>
+        
+        <div className="right-side">
+          <div className="login-section">
+            <h2>Login</h2>
+            <LoginForm />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
 
 export default LandingPage;
+
+

@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import '../../styles/ProductList.css';
 
 const ProductList = ({ products, loading }) => {
   if (loading) {
@@ -10,17 +11,19 @@ const ProductList = ({ products, loading }) => {
   }
 
   return (
-    <div>
+    <div className="product-list-container">
       <h2>Products List</h2>
-      <ul>
+      <div className="product-grid">
         {products.map((product) => (
-          <li key={product.id}>
-            <strong>{product.name}</strong> (SKU: {product.sku}, Quantity:{" "}
-            {product.quantity}, Price: ${product.price.toFixed(2)}, Reorder Level:{" "}
-            {product.reorder_level})
-          </li>
+          <div key={product.id} className="product-card">
+            <h3>{product.name}</h3>
+            <p><strong>SKU:</strong> {product.sku}</p>
+            <p><strong>Quantity:</strong> {product.quantity}</p>
+            <p><strong>Price:</strong> ${typeof product.price === "number" ? product.price.toFixed(2) : "N/A"}</p>
+            <p><strong>Reorder Level:</strong> {product.reorder_level}</p>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
@@ -32,7 +35,7 @@ ProductList.propTypes = {
       name: PropTypes.string.isRequired,
       sku: PropTypes.string.isRequired,
       quantity: PropTypes.number.isRequired,
-      price: PropTypes.number.isRequired,
+      price: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
       reorder_level: PropTypes.number.isRequired,
     })
   ).isRequired,

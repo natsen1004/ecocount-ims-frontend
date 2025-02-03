@@ -1,13 +1,19 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import AddProductForm from '../components/feature/AddProductForm';
-import RemoveProductForm from '../components/feature/RemoveProductForm';
-import ProductList from '../components/feature/ProductList';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import AddProductForm from "../components/feature/AddProductForm";
+import RemoveProductForm from "../components/feature/RemoveProductForm";
+import StockMovementForm from "../components/feature/StockMovementForm";
+import ProductList from "../components/feature/ProductList"; 
+import "../styles/ProductsPage.css";
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [showAddProductForm, setShowAddProductForm] = useState(false);
+  const [showRemoveProductForm, setShowRemoveProductForm] = useState(false);
+  const [showStockMovementForm, setShowStockMovementForm] = useState(false);
 
   const fetchProducts = async () => {
     try {
@@ -24,6 +30,10 @@ const ProductsPage = () => {
     }
   };
 
+  useEffect(() => {
+    fetchProducts(); 
+  }, []);
+
   const addProduct = async (newProduct) => {
     try {
       setLoading(true);
@@ -35,6 +45,7 @@ const ProductsPage = () => {
       if (response.status === 201) {
         setProducts([...products, response.data]);
         alert("Product added successfully!");
+        fetchProducts();
       }
     } catch (error) {
       console.error("Error adding product:", error.message);
@@ -54,6 +65,7 @@ const ProductsPage = () => {
       if (response.status === 200) {
         setProducts(products.filter((product) => product.id !== parseInt(productId)));
         alert("Product removed successfully!");
+        fetchProducts();
       }
     } catch (error) {
       console.error("Error removing product:", error.message);
@@ -68,20 +80,30 @@ const ProductsPage = () => {
   }, []);
 
   return (
-    <div>
+    <div className="products-container">
       <h1>Products Management</h1>
 
-      {error && <p>{error}</p>}
+      {error && <p className="error-message">{error}</p>}
 
-      <AddProductForm addProduct={addProduct} loading={loading} />
+      <div className="form-toggle-buttons">
+        <button onClick={() => setShowAddProductForm(!showAddProductForm)}>
+          {showAddProductForm ? "Hide Add Product Form" : "Show Add Product Form"}
+        </button>
+        <button onClick={() => setShowRemoveProductForm(!showRemoveProductForm)}>
+          {showRemoveProductForm ? "Hide Remove Product Form" : "Show Remove Product Form"}
+        </button>
+        <button onClick={() => setShowStockMovementForm(!showStockMovementForm)}>
+          {showStockMovementForm ? "Hide Stock Movement Form" : "Show Stock Movement Form"}
+        </button>
+      </div>
 
-      <RemoveProductForm
-        products={products}
-        removeProduct={removeProduct}
-        loading={loading}
-      />
+      {showAddProductForm && <AddProductForm addProduct={addProduct} loading={loading} />}
+      {showRemoveProductForm && (
+        <RemoveProductForm products={products} removeProduct={removeProduct} loading={loading} />
+      )}
+      {showStockMovementForm && <StockMovementForm fetchProducts={fetchProducts} />}
 
-      <ProductList products={products} loading={loading}/>
+      <ProductList products={products} loading={loading} />
     </div>
   );
 };
