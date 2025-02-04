@@ -20,7 +20,6 @@ const LandingPage = () => {
         
         <div className="right-side">
           <div className="login-section">
-            <h2>Login</h2>
             <LoginForm />
           </div>
         </div>

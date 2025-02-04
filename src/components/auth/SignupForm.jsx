@@ -4,7 +4,7 @@ const SignUpForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [role, setRole] = useState("user"); // Default role is "user"
+  const [role, setRole] = useState("user"); 
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -29,7 +29,7 @@ const SignUpForm = () => {
     setLoading(true);
     setErrorMessage("");
 
-    const apiUrl = "https://ecocount-ims-backend.onrender.com/signup"; // Adjust the endpoint for signup
+    const apiUrl = "https://ecocount-ims-backend.onrender.com/auth/signup"; 
 
     try {
       const response = await fetch(apiUrl, {
