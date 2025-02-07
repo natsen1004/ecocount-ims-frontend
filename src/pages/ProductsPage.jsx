@@ -3,36 +3,59 @@ import axios from "axios";
 import AddProductForm from "../components/feature/AddProductForm";
 import RemoveProductForm from "../components/feature/RemoveProductForm";
 import StockMovementForm from "../components/feature/StockMovementForm";
-import ProductList from "../components/feature/ProductList"; 
+import ProductList from "../components/feature/ProductList";
 import "../styles/ProductsPage.css";
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [users, setUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState("");
 
   const [showAddProductForm, setShowAddProductForm] = useState(false);
   const [showRemoveProductForm, setShowRemoveProductForm] = useState(false);
   const [showStockMovementForm, setShowStockMovementForm] = useState(false);
 
-  const fetchProducts = async () => {
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get("https://ecocount-ims-backend.onrender.com/users");
+        setUsers(response.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setError("Failed to fetch users.");
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  const fetchProducts = async (userId) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await axios.get(
-        "https://ecocount-ims-backend.onrender.com/products"
-      );
+      const response = await axios.get("https://ecocount-ims-backend.onrender.com/products", {
+        params: { user_id: userId },
+      });
       setProducts(response.data);
     } catch (error) {
-      console.error("Error fetching products:", error.message);
-      setError("Failed to fetch products. Please try again.");
+      console.error("Error fetching products:", error);
+      setError("Failed to fetch products.");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchProducts(); 
-  }, []);
+  const handleUserChange = (e) => {
+    const userId = e.target.value;
+    setSelectedUserId(userId);
+    if (userId) {
+      fetchProducts(userId);
+    } else {
+      setProducts([]);
+    }
+  };
 
   const addProduct = async (newProduct) => {
     try {
@@ -41,11 +64,9 @@ const ProductsPage = () => {
         "https://ecocount-ims-backend.onrender.com/products",
         newProduct
       );
-
       if (response.status === 201) {
-        setProducts([...products, response.data]);
         alert("Product added successfully!");
-        fetchProducts();
+        fetchProducts(newProduct.user_id);
       }
     } catch (error) {
       console.error("Error adding product:", error.message);
@@ -59,13 +80,14 @@ const ProductsPage = () => {
     try {
       setLoading(true);
       const response = await axios.delete(
-        `https://ecocount-ims-backend.onrender.com/products/${productId}`
+        `https://ecocount-ims-backend.onrender.com/products/${productId}`,
+        {
+          data: { user_id: selectedUserId },
+        }
       );
-
       if (response.status === 200) {
-        setProducts(products.filter((product) => product.id !== parseInt(productId)));
         alert("Product removed successfully!");
-        fetchProducts();
+        fetchProducts(selectedUserId);
       }
     } catch (error) {
       console.error("Error removing product:", error.message);
@@ -75,15 +97,27 @@ const ProductsPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
   return (
     <div className="products-container">
       <h1>Products Management</h1>
 
       {error && <p className="error-message">{error}</p>}
+
+      <div className="form-group">
+        <label htmlFor="userSelect">Select User:</label>
+        <select
+          id="userSelect"
+          value={selectedUserId}
+          onChange={handleUserChange}
+        >
+          <option value="">-- Select a User --</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.email}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className="form-toggle-buttons">
         <button onClick={() => setShowAddProductForm(!showAddProductForm)}>
@@ -97,15 +131,24 @@ const ProductsPage = () => {
         </button>
       </div>
 
-      {showAddProductForm && <AddProductForm addProduct={addProduct} loading={loading} />}
-      {showRemoveProductForm && (
-        <RemoveProductForm products={products} removeProduct={removeProduct} loading={loading} />
+      {showAddProductForm && (
+        <AddProductForm addProduct={addProduct} loading={loading} />
       )}
-      {showStockMovementForm && <StockMovementForm fetchProducts={fetchProducts} />}
+      {showRemoveProductForm && (
+        <RemoveProductForm
+          products={products}
+          removeProduct={removeProduct}
+          loading={loading}
+        />
+      )}
+      {showStockMovementForm && (
+        <StockMovementForm fetchProducts={fetchProducts} selectedUserId={selectedUserId} />
+      )}
 
-      <ProductList products={products} loading={loading} />
+      <ProductList initialProducts={products} loading={loading} />
     </div>
   );
 };
 
 export default ProductsPage;
+

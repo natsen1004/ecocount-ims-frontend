@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 import '../../styles/ProductForms.css';
 
 const AddProductForm = ({ addProduct, loading }) => {
@@ -8,6 +9,44 @@ const AddProductForm = ({ addProduct, loading }) => {
   const [quantity, setQuantity] = useState(0);
   const [reorderLevel, setReorderLevel] = useState(0);
   const [price, setPrice] = useState(0.0);
+  const [users, setUsers] = useState([]);
+  const [selectedUserId, setSelectedUserId] = useState('');
+
+  const handleNameChange = (e) => {
+    setName(e.target.value);
+  };
+  
+  const handleSkuChange = (e) => {
+    setSku(e.target.value);
+  };
+
+  const handleQuantityChange = (e) => {
+    setQuantity(e.target.value);
+  };
+  
+  const handleReorderLevelChange = (e) => {
+    setReorderLevel(e.target.value);
+  }
+
+  const handlePriceChange = (e) => {
+    setPrice(parseFloat(e.target.value) || 0);
+  };  
+
+  const handleSelectedUserIdChange = (e) => {
+    setSelectedUserId(e.target.value);
+  }
+  
+  useEffect(() => {
+    axios.get('https://ecocount-ims-backend.onrender.com/users')
+      .then(response => {
+        setUsers(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching users:', error);
+      });
+  }, []);
+
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -17,12 +56,18 @@ const AddProductForm = ({ addProduct, loading }) => {
       return;
     }
 
+    if (!selectedUserId) {
+      alert('Please select a user.');
+      return;
+    }
+
     const productData = {
       name: name.trim(),
       sku: sku.trim(),
-      quantity: isNaN(quantity) ? 0 : quantity, 
-      reorder_level: isNaN(reorderLevel) ? 0 : reorderLevel, 
-      price: isNaN(price) ? 0.0 : price, 
+      quantity: isNaN(quantity) ? 0 : quantity,
+      reorder_level: isNaN(reorderLevel) ? 0 : reorderLevel,
+      price: isNaN(price) ? 0.0 : parseFloat(price),
+      user_id: selectedUserId,
     };
 
     console.log("Submitting Product Data:", productData); 
@@ -32,7 +77,8 @@ const AddProductForm = ({ addProduct, loading }) => {
     setSku("");
     setQuantity(0);
     setReorderLevel(0);
-    setPrice(0.0);
+    setPrice(0);
+    setSelectedUserId('');
   };
 
   return (
@@ -45,7 +91,7 @@ const AddProductForm = ({ addProduct, loading }) => {
           type="text"
           id="name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={handleNameChange}
           required
         />
       </div>
@@ -56,7 +102,7 @@ const AddProductForm = ({ addProduct, loading }) => {
           type="text"
           id="sku"
           value={sku}
-          onChange={(e) => setSku(e.target.value)}
+          onChange={handleSkuChange}
         />
       </div>
 
@@ -66,7 +112,7 @@ const AddProductForm = ({ addProduct, loading }) => {
           type="number"
           id="quantity"
           value={quantity}
-          onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}
+          onChange={handleQuantityChange}
           min="0"
         />
       </div>
@@ -77,7 +123,7 @@ const AddProductForm = ({ addProduct, loading }) => {
           type="number"
           id="reorderLevel"
           value={reorderLevel}
-          onChange={(e) => setReorderLevel(parseInt(e.target.value) || 0)}
+          onChange={handleReorderLevelChange}
           min="0"
         />
       </div>
@@ -88,10 +134,27 @@ const AddProductForm = ({ addProduct, loading }) => {
           type="number"
           id="price"
           value={price}
-          onChange={(e) => setPrice(parseFloat(e.target.value) || 0.0)}
+          onChange={handlePriceChange}
           step="0.01"
           min="0"
         />
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="userId">User:</label>
+        <select
+          id="userId"
+          value={selectedUserId}
+          onChange={handleSelectedUserIdChange}
+          required
+        >
+          <option value="">Select a user</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.email} 
+            </option>
+          ))}
+        </select>
       </div>
 
       <button type="submit" disabled={loading}>

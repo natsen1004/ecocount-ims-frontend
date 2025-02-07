@@ -1,7 +1,15 @@
 import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react';
 import '../../styles/ProductList.css';
 
-const ProductList = ({ products, loading }) => {
+const ProductList = ({ initialProducts = [], loading }) => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    setProducts(initialProducts);
+    console.log("Updated products:", initialProducts);
+  }, [initialProducts]);
+
   if (loading) {
     return <p>Loading products...</p>;
   }
@@ -29,7 +37,7 @@ const ProductList = ({ products, loading }) => {
 };
 
 ProductList.propTypes = {
-  products: PropTypes.arrayOf(
+  initialProducts: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,

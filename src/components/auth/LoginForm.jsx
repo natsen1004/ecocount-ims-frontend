@@ -32,7 +32,7 @@ const LoginForm = () => {
     setLoading(true);
     setErrorMessage("");
   
-    const apiUrl = "https://ecocount-ims-backend.onrender.com/auth/login";
+    const apiUrl = "https://ecocount-ims-backend.onrender.com/auth/login"
   
     try {
       const response = await fetch(apiUrl, {
@@ -41,8 +41,9 @@ const LoginForm = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: email.trim().toLowerCase(),  
-          password: password.trim(),  
+          email,  
+          password,
+          rememberMe  
         }),
       });
   
@@ -53,8 +54,6 @@ const LoginForm = () => {
   
       const data = await response.json();
       console.log("Login successful:", data);
-      localStorage.setItem("token", data.token);
-  
       window.location.href = "/dashboard";
     } catch (error) {
       console.error("Error during login:", error.message);
