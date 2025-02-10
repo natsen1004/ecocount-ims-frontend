@@ -12,6 +12,9 @@ const LoginForm = () => {
   const [showSignup, setShowSignup] = useState(false); 
   const [showPassword, setShowPassword] = useState(false);
 
+
+  console.log("API URL being used:", import.meta.env.VITE_BACKEND_URL);
+
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const handleSubmit = async (e) => {
