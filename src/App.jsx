@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navigation from "./components/common/Navbar";
 import Footer from "./components/common/Footer";
 import LandingPage from "./pages/LandingPage";
+import Dashboard from "./pages/Dashboard";
 import LoginForm from "./components/auth/LoginForm";
 import SignupForm from "./components/auth/SignupForm";
 import ProductsPage from "./pages/ProductsPage";
@@ -75,6 +76,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginForm />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/products" element={<ProductsPage products={products} loading={loading} />} />
           <Route path="/reports" element={<ReportsPage reports={reports} />} />
