@@ -28,22 +28,13 @@ const StockMovementForm = ({ fetchProducts }) => {
   }, []);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      if (!selectedUserId) return; 
-
-      try {
-        console.log("Fetching products for user:", selectedUserId);
-        const response = await axios.get("https://ecocount-ims-backend.onrender.com/products", {
-          params: { user_id: selectedUserId },
-        });
-        console.log("Products fetched:", response.data);
-        setProducts(response.data);
-      } catch (error) {
-        console.error("Error fetching products:", error.response?.data || error.message);
-      }
-    };
-
-    fetchProducts();
+    if (!selectedUserId) return;
+    
+    axios.get("https://ecocount-ims-backend.onrender.com/products", {
+      params: { user_id: selectedUserId },
+    })
+    .then(response => setProducts(response.data))
+    .catch(error => console.error("Error fetching products:", error));
   }, [selectedUserId]);
 
   const handleChange = (e) => {
@@ -51,8 +42,7 @@ const StockMovementForm = ({ fetchProducts }) => {
     setFormData(prev => ({ ...prev, [name]: value }));
 
     if (name === "productName") {
-      const trimmedValue = value.trim().toLowerCase();
-      const matchedProduct = products.find(product => product.name.trim().toLowerCase() === trimmedValue);
+      const matchedProduct = products.find(product => product.name.trim().toLowerCase() === value.trim().toLowerCase());
 
       if (matchedProduct) {
         console.log("Matched Product:", matchedProduct);
@@ -61,7 +51,7 @@ const StockMovementForm = ({ fetchProducts }) => {
           sku: matchedProduct.sku, 
         }));
       } else {
-        console.warn(`No matching product found for "${value}"`);
+        console.warn(`⚠️ No matching product found for "${value}"`);
         setFormData(prev => ({
           ...prev,
           sku: "", 
@@ -72,66 +62,97 @@ const StockMovementForm = ({ fetchProducts }) => {
 
   const handleUserChange = (e) => {
     setSelectedUserId(e.target.value);
-    setProducts([]);
-    setFormData({
-      productName: "",
-      sku: "",
-      quantityChange: "",
-      newQuantity: "",
-      reason: "",
-      timestamp: new Date().toISOString().slice(0, 16),
-    });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("Submitting Form Data:", formData);
-
-    if (!selectedUserId) {
-        alert("Please select a user.");
-        return;
-    }
-
-    if (!formData.productName) {
-        alert("Please enter a product name.");
-        return;
-    }
-
-    console.log("Submitting Stock Movement Data:", formData);
-
-    const matchingProduct = products.find(product => product.name === formData.productName);
-    if (!matchingProduct) {
-        alert("Product not found in the product list.");
-        return;
-    }
-
-    const stockMovementData = {
-        product_name: formData.productName,  
-        sku: formData.sku || null, 
-        quantity_change: parseInt(formData.quantityChange, 10),
-        new_quantity: parseInt(formData.newQuantity, 10),
-        reason: formData.reason,
-        user_id: selectedUserId,
-        timestamp: new Date(formData.timestamp).toISOString(),
-    };
-
-    console.log("Final Stock Movement Data:", stockMovementData);
-
+  const createNotification = async (stockMovementData) => {
     try {
+        const userEmail = users.find(user => user.id === selectedUserId)?.email;
+        if (!selectedUserId || !userEmail || !stockMovementData.product_name || !stockMovementData.product_id) {
+            console.error("Missing required fields:", { selectedUserId, userEmail, stockMovementData });
+            return;
+        }
+
+        const notificationData = {
+            user_email: userEmail,
+            type: "Stock Movement",
+            message: `Stock ${stockMovementData.quantity_change >= 0 ? 'increased' : 'decreased'} by ${Math.abs(stockMovementData.quantity_change)} units for ${stockMovementData.product_name}. New quantity: ${stockMovementData.new_quantity}. Reason: ${stockMovementData.reason}`,
+            product_id: stockMovementData.product_id, 
+            read: false,
+            sent_at: new Date().toISOString()
+        };
+
+        console.log("📩 Sending notification data:", notificationData);
+
         const response = await axios.post(
-            "https://ecocount-ims-backend.onrender.com/stock_movement",
-            stockMovementData
+            "https://ecocount-ims-backend.onrender.com/notifications",
+            notificationData
         );
 
-        console.log("Stock movement recorded:", response.data);
-        alert("Stock movement recorded successfully!");
-
-        if (fetchProducts) {
-            fetchProducts(selectedUserId);
-        }
+        console.log("Notification created successfully:", response.data);
     } catch (error) {
-        console.error("Error submitting stock movement:", error.response?.data || error.message);
+        console.error("Error creating notification:", error.response?.data || error.message);
     }
+};
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  console.log("📤 Submitting Stock Movement Data:", formData);
+
+  if (!selectedUserId) {
+      alert("Please select a user.");
+      return;
+  }
+
+  if (!formData.productName) {
+      alert("Please enter a product name.");
+      return;
+  }
+
+  const matchingProduct = products.find(product => product.name === formData.productName);
+  if (!matchingProduct) {
+      alert("Product not found in the product list.");
+      return;
+  }
+
+  const stockMovementData = {
+      product_name: formData.productName,
+      product_id: matchingProduct.id,  
+      sku: formData.sku || null,
+      quantity_change: parseInt(formData.quantityChange, 10),
+      new_quantity: parseInt(formData.newQuantity, 10),
+      reason: formData.reason,
+      user_id: selectedUserId,
+      timestamp: new Date(formData.timestamp).toISOString(),
+  };
+
+  console.log("Final Stock Movement Data before submission:", stockMovementData);
+
+  try {
+      const response = await axios.post(
+          "https://ecocount-ims-backend.onrender.com/stock_movement",
+          stockMovementData
+      );
+      console.log("Stock movement recorded:", response.data);
+      await createNotification(stockMovementData);
+
+      alert("Stock movement recorded successfully!");
+
+      if (fetchProducts) {
+          fetchProducts(selectedUserId);
+      }
+
+      setFormData({
+          productName: "",
+          sku: "",
+          quantityChange: "",
+          newQuantity: "",
+          reason: "",
+          timestamp: new Date().toISOString().slice(0, 16),
+      });
+  } catch (error) {
+      console.error("Error submitting stock movement:", error.response?.data || error.message);
+      alert("Error recording stock movement. Please try again.");
+  }
 };
 
 
@@ -224,7 +245,8 @@ StockMovementForm.propTypes = {
   fetchProducts: PropTypes.func.isRequired,
 };
 
-
 export default StockMovementForm;
+
+
 
 

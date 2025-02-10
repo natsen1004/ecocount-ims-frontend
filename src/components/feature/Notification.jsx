@@ -1,75 +1,108 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-const Notifications = () => {
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useUser } from "../../context/UserContext";
+import "../../styles/Notifications.css";
+
+const Notifications = ({ dropdownOpen, toggleDropdown }) => {
+  const { userEmail } = useUser();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get("http://127.0.0.1:5000/notifications");
+  const fetchNotifications = async () => {
+    if (!userEmail) return;
+
+    try {
+      const response = await axios.get(
+        "https://ecocount-ims-backend.onrender.com/notifications",
+        { params: { user_email: userEmail } }
+      );
+
+      if (Array.isArray(response.data)) {
         setNotifications(response.data);
-      } catch {
-        setError("Failed to fetch notifications. Please try again later.");
-      } finally {
-        setLoading(false);
+        setUnreadCount(response.data.filter((n) => !n.read).length);
+      } else {
+        setNotifications([]);
       }
-    };
-
-    fetchNotifications();
-  }, []);
-
-  const handleRetry = () => {
-    setError(null);
-    setNotifications([]);
-    setLoading(true);
-    
-    axios.get("http://127.0.0.1:5000/notifications")
-      .then((response) => {
-        setNotifications(response.data);
-      })
-      .catch(() => {
-        setError("Failed to fetch notifications. Please try again later.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    } catch (error) {
+      console.error("Notification fetch error:", error);
+      setError("Failed to fetch notifications.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (loading) {
-    return <div>Loading notifications...</div>;
-  }
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [userEmail]);
 
-  if (error) {
-    return (
-      <div>
-        <p>{error}</p>
-        <button onClick={handleRetry}>Retry</button>
-      </div>
-    );
-  }
+  const markAsRead = async (notificationId) => {
+    try {
+      await axios.post(
+        "https://ecocount-ims-backend.onrender.com/notifications/mark_read",
+        {
+          notification_id: notificationId,
+          user_email: userEmail, 
+        }
+      );
+
+      setNotifications((prev) =>
+        prev.map((notification) =>
+          notification.id === notificationId ? { ...notification, read: true } : notification
+        )
+      );
+
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
+
+  if (!dropdownOpen) return null;
 
   return (
-    <div className="p-4 grid gap-4">
-      <h1 className="text-2xl font-bold">Low Stock Notifications</h1>
-      {notifications.length === 0 ? (
-        <p>No low-stock notifications at this time.</p>
-      ) : (
-        notifications.map((notification) => (
-          <div key={notification.id} className="shadow-md">
-            <div className="notification-card-content">
-              <h2 className="text-xl font-semibold">{notification.type}</h2>
-              <p>Product ID: {notification.product_id}</p>
-              <p>Message: {notification.message || "Stock levels are low."}</p>
-              <p>Sent At: {new Date(notification.sent_at).toLocaleString()}</p>
-            </div>
+    <div className="notifications-dropdown">
+      <div className="notifications-header">
+        <h1 className="notifications-title">Notifications</h1>
+        <button onClick={toggleDropdown} className="close-button">✖</button>
+      </div>
+
+      <div className="notifications-content">
+        {loading ? (
+          <div className="loading">Loading notifications...</div>
+        ) : error ? (
+          <div className="error">{error}</div>
+        ) : notifications.length === 0 ? (
+          <div className="no-notifications">No notifications at this time.</div>
+        ) : (
+          <div className="notifications-list">
+            {notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className={`notification-item ${!notification.read ? 'unread' : ''}`}
+                onClick={() => markAsRead(notification.id)}
+              >
+                <div className="notification-type">{notification.type}</div>
+                <div className="notification-message">{notification.message}</div>
+                <div className="notification-time">
+                  {new Date(notification.sent_at).toLocaleString()}
+                </div>
+              </div>
+            ))}
           </div>
-        ))
-      )}
+        )}
+      </div>
     </div>
   );
 };
 
 export default Notifications;
+
+
+
+
+
+

@@ -1,65 +1,130 @@
 .landing-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a472a, #2E7D32);
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
+  justify-content: center;
+  padding: 2rem;
 }
 
 .content-wrapper {
   display: flex;
-  flex-direction: row; 
-  justify-content: space-between;
-  align-items: center;
-  width: 80%;
   max-width: 1200px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
 .left-side {
-  width: 50%;
+  flex: 1;
+  padding: 4rem;
+  display: flex;
+  align-items: center;
+}
+
+.description {
+  max-width: 500px;
 }
 
 .logo-container {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
 }
 
-.logo {
-  height: 80px;
-  width: auto;
-  margin-right: 10px;
+.logo-container h1 {
+  color: #1a472a;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
 }
 
 .description h2 {
+  color: #2E7D32;
   font-size: 2rem;
-  margin-bottom: 15px;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
 }
 
 .description p {
-  font-size: 1.2rem;
+  color: #666;
+  font-size: 1.1rem;
   line-height: 1.6;
-  color: #555;
+  margin-bottom: 2rem;
 }
 
 .right-side {
-  width: 40%;
+  flex: 1;
+  background: #f8f9fa;
+  padding: 4rem;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-@media (max-width: 900px) {
+.login-section {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .content-wrapper {
+    max-width: 90%;
+  }
+  
+  .left-side,
+  .right-side {
+    padding: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
   .content-wrapper {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
   }
 
-  .left-side, .right-side {
-    width: 100%;
-  }
-
+  .left-side,
   .right-side {
-    margin-top: 20px;
+    padding: 2rem;
   }
+
+  .description {
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .logo-container h1 {
+    font-size: 2rem;
+  }
+
+  .description h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Optional: Add some animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo-container,
+.description h2,
+.description p {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.description h2 {
+  animation-delay: 0.2s;
+}
+
+.description p {
+  animation-delay: 0.4s;
 }

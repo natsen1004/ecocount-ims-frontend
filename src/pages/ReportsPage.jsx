@@ -1,86 +1,84 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Line, Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Pie } from "react-chartjs-2";
+import { useUser } from "../context/UserContext"; 
+import "chart.js/auto";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ReportsPage = () => {
-  const [users, setUsers] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState('');
-  const [stockMovements, setStockMovements] = useState([]);
+  const { userId } = useUser(); 
+  const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    if (!userId) return; 
+
+    const fetchReports = async () => {
+      setLoading(true);
       try {
-        const response = await axios.get('https://ecocount-ims-backend.onrender.com/users');
-        setUsers(response.data);
+        const response = await axios.get("https://ecocount-ims-backend.onrender.com/reports", {
+          params: { user_id: userId },
+        });
+
+        console.log("Fetched Reports:", response.data);  
+
+        setReports(Array.isArray(response.data) ? response.data : []);
+        setError(null);
       } catch (err) {
-        console.error('Error fetching users:', err);
-        setError('Error fetching users.');
+        console.error("Error fetching reports:", err);
+        setError("Error fetching reports.");
+      } finally {
+        setLoading(false);
       }
     };
-    fetchUsers();
-  }, []);
 
-  const fetchStockMovements = async (userId) => {
-    setLoading(true);
-    try {
-      const response = await axios.get('https://ecocount-ims-backend.onrender.com/stock_movement', {
-        params: { user_id: userId },
-      });
-      setStockMovements(response.data);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching stock movements:', err);
-      setError('Error fetching stock movements.');
-    } finally {
-      setLoading(false);
+    fetchReports();
+  }, [userId]); 
+
+  if (!userId) {
+    return <p>Please select a user to view reports.</p>; 
+  }
+
+  const sortedMovements = reports
+    .flatMap((report) =>
+      report.stock_movements.map((movement) => ({
+        ...movement,
+        product_name: report.product_name,
+      }))
+    )
+    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+  const productSalesMap = {};
+
+  reports.forEach((report) => {
+    if (!report.product_name) {
+      console.warn("Skipping report with missing product name:", report);
+      return;
     }
-  };
 
-  const handleUserChange = (e) => {
-    const userId = e.target.value;
-    setSelectedUserId(userId);
-    if (userId) {
-      fetchStockMovements(userId);
-    } else {
-      setStockMovements([]);
+    if (!productSalesMap[report.product_name]) {
+      productSalesMap[report.product_name] = 0;
     }
-  };
 
-  const sortedMovements = [...stockMovements].sort(
-    (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
-  );
+    productSalesMap[report.product_name] += Number(report.total_quantity_sold) || 0;
+  });
 
-  const labels = sortedMovements.map((movement) =>
-    new Date(movement.timestamp).toLocaleDateString()
-  );
-  const quantityChanges = sortedMovements.map((movement) => movement.quantity_change);
-  const newQuantities = sortedMovements.map((movement) => movement.new_quantity);
+  console.log("Final Product Names for Pie Chart:", Object.keys(productSalesMap));
+  console.log("Final Quantity Sold for Pie Chart:", Object.values(productSalesMap));
 
-  const lineChartData = {
-    labels,
+  const pieChartData = {
+    labels: Object.keys(productSalesMap),
     datasets: [
       {
-        label: 'Quantity Change',
-        data: quantityChanges,
-        borderColor: 'rgba(75,192,192,1)',
-        backgroundColor: 'rgba(75,192,192,0.2)',
-        fill: true,
-      },
-    ],
-  };
-
-  const barChartData = {
-    labels,
-    datasets: [
-      {
-        label: 'New Quantity',
-        data: newQuantities,
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        label: "Total Quantity Sold",
+        data: Object.values(productSalesMap).map(q => q || 0.1), 
+        backgroundColor: [
+          "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", 
+          "#F7464A", "#46BFBD", "#FDB45C", "#949FB1", "#4D5360",
+        ],
       },
     ],
   };
@@ -88,31 +86,52 @@ const ReportsPage = () => {
   return (
     <div>
       <h1 className="reports">Reports</h1>
-      <div>
-        <label htmlFor="userSelect">Select User:</label>
-        <select id="userSelect" value={selectedUserId} onChange={handleUserChange}>
-          <option value="">-- Select a user --</option>
-          {users.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.email}
-            </option>
-          ))}
-        </select>
-      </div>
 
       {loading && <p>Loading reports...</p>}
       {error && <p>{error}</p>}
 
-      {!loading && !error && stockMovements.length > 0 && (
+      {!loading && !error && reports.length > 0 && (
         <>
-          <div>
-            <h2>Stock Movements Over Time</h2>
-            <Line data={lineChartData} />
-          </div>
+          {Object.keys(productSalesMap).length > 0 ? (
+            <div>
+              <h2>Total Quantity Sold Per Product</h2>
+              <div style={{ width: "400px", height: "400px", margin: "0 auto" }}>
+                <Pie 
+                  data={pieChartData} 
+                  options={{ 
+                    responsive: true, 
+                    maintainAspectRatio: false 
+                  }} 
+                />
+              </div>
+
+            </div>
+          ) : (
+            <p>No sales data available.</p>
+          )}
 
           <div>
-            <h2>Stock Levels After Movements</h2>
-            <Bar data={barChartData} />
+            <h2>Stock Movements</h2>
+            <table border="1">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Product</th>
+                  <th>Quantity Change</th>
+                  <th>New Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedMovements.map((movement, index) => (
+                  <tr key={index}>
+                    <td>{new Date(movement.timestamp).toLocaleDateString()}</td>
+                    <td>{movement.product_name}</td>
+                    <td>{movement.quantity_change}</td>
+                    <td>{movement.new_quantity}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </>
       )}
@@ -121,3 +140,5 @@ const ReportsPage = () => {
 };
 
 export default ReportsPage;
+
+
