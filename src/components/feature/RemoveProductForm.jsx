@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_URL } from '../../utilities/api';
 import '../../styles/ProductForms.css';
 
 const RemoveProductForm = ({ products, removeProduct, loading }) => {
@@ -17,7 +18,7 @@ const RemoveProductForm = ({ products, removeProduct, loading }) => {
   };
 
   useEffect(() => {
-    axios.get('https://ecocount-ims-backend.onrender.com/users')
+    axios.get(`${API_URL}/users`)
       .then(response => {
         setUsers(response.data);
       })
@@ -25,6 +26,7 @@ const RemoveProductForm = ({ products, removeProduct, loading }) => {
         console.error('Error fetching users:', error);
       });
   }, []);
+
 
   const handleSubmit = (e) => {
     e.preventDefault();

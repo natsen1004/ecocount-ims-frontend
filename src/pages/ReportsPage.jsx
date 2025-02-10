@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Pie } from "react-chartjs-2";
 import { useUser } from "../context/UserContext"; 
+import { API_URL } from "../utilities/api";
 import "chart.js/auto";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
@@ -19,7 +20,7 @@ const ReportsPage = () => {
     const fetchReports = async () => {
       setLoading(true);
       try {
-        const response = await axios.get("https://ecocount-ims-backend.onrender.com/reports", {
+        const response = await axios.get(`${API_URL}/reports`, {
           params: { user_id: userId },
         });
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { API_URL } from "../utilities/api";
 import { useUser } from "../context/UserContext"; 
 import AddProductForm from "../components/feature/AddProductForm";
 import RemoveProductForm from "../components/feature/RemoveProductForm";
@@ -22,7 +23,7 @@ const ProductsPage = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get("https://ecocount-ims-backend.onrender.com/products", {
+      const response = await axios.get(`${API_URL}/products`, {
         params: { user_id: userId },
       });
       setProducts(response.data);
@@ -41,13 +42,10 @@ const ProductsPage = () => {
   const addProduct = async (newProduct) => {
     try {
       setLoading(true);
-      const response = await axios.post(
-        "https://ecocount-ims-backend.onrender.com/products",
-        newProduct
-      );
+      const response = await axios.post(`${API_URL}/products`, newProduct);
       if (response.status === 201) {
         alert("Product added successfully!");
-        fetchProducts();  
+        fetchProducts();
       }
     } catch (error) {
       console.error("Error adding product:", error.message);
@@ -60,13 +58,12 @@ const ProductsPage = () => {
   const removeProduct = async (productId) => {
     try {
       setLoading(true);
-      const response = await axios.delete(
-        `https://ecocount-ims-backend.onrender.com/products/${productId}`,
-        { data: { user_id: userId } }
-      );
+      const response = await axios.delete(`${API_URL}/products/${productId}`, {
+        data: { user_id: userId }
+      });
       if (response.status === 200) {
         alert("Product removed successfully!");
-        fetchProducts();  
+        fetchProducts();
       }
     } catch (error) {
       console.error("Error removing product:", error.message);

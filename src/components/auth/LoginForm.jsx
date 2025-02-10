@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import SignupForm from './SignupForm'; 
 import '../../styles/AuthForms.css'; 
+import { API_URL } from '../../utilities/api';
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -11,47 +12,25 @@ const LoginForm = () => {
   const [showSignup, setShowSignup] = useState(false); 
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
-
-  const handleRememberMe = (e) => {
-    setRememberMe(e.target.checked);
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  }
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setErrorMessage("");
   
-    const apiUrl = "https://ecocount-ims-backend.onrender.com/auth/login"
-  
     try {
-      const response = await fetch(apiUrl, {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,  
-          password,
-          rememberMe  
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, rememberMe }),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Failed to log in"); 
       }
-  
+
       const data = await response.json();
       console.log("Login successful:", data);
       window.location.href = "/dashboard";
@@ -62,7 +41,6 @@ const LoginForm = () => {
       setLoading(false);
     }
   };
-  
 
   return (
     <div className="auth-container">
@@ -72,24 +50,20 @@ const LoginForm = () => {
           <form onSubmit={handleSubmit}>
             <div>
               <label className="form-label" htmlFor="email">Email address</label>
-              <input type="email" id="email" value={email} onChange={handleEmailChange} required />
+              <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
 
             <div>
               <label className="form-label" htmlFor="password">Password</label>
-              <input type="password" id="password" value={password} onChange={handlePasswordChange} required />
-              <button
-                  type="button"
-                  className="show-password-btn"
-                  onClick={togglePasswordVisibility}
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
+              <input type={showPassword ? "text" : "password"} id="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <button type="button" className="show-password-btn" onClick={togglePasswordVisibility}>
+                {showPassword ? "Hide" : "Show"}
+              </button>
             </div>
 
             <div className="form-check">
               <label className="form-check-label" htmlFor="remember-me">Remember Me</label>
-              <input className="form-check-input" type="checkbox" id="remember-me" checked={rememberMe} onChange={handleRememberMe} />
+              <input className="form-check-input" type="checkbox" id="remember-me" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
             </div>
 
             {errorMessage && <p className="text-danger">{errorMessage}</p>}
@@ -100,7 +74,7 @@ const LoginForm = () => {
           </form>
 
           <p className="toggle-text">
-            Don`t have an account?{" "}
+            Don’t have an account?{" "}
             <button className="toggle-btn" onClick={() => setShowSignup(true)}>Sign Up</button>
           </p>
         </>
@@ -118,6 +92,7 @@ const LoginForm = () => {
 };
 
 export default LoginForm;
+
 
 
 

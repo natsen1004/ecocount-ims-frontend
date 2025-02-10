@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext"; 
 import "../../styles/ProductForms.css";
+import { API_URL } from "../../utilities/api";
 
 const StockMovementForm = ({ fetchProducts }) => {
   const { user } = useContext(AuthContext);
@@ -22,20 +23,22 @@ const StockMovementForm = ({ fetchProducts }) => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    axios.get("https://ecocount-ims-backend.onrender.com/users")
+    axios.get(`${API_URL}/users`)
       .then(response => setUsers(response.data))
       .catch(error => console.error("Error fetching users:", error));
   }, []);
 
+
   useEffect(() => {
     if (!selectedUserId) return;
     
-    axios.get("https://ecocount-ims-backend.onrender.com/products", {
+    axios.get(`${API_URL}/products`, {
       params: { user_id: selectedUserId },
     })
     .then(response => setProducts(response.data))
     .catch(error => console.error("Error fetching products:", error));
   }, [selectedUserId]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,7 +54,7 @@ const StockMovementForm = ({ fetchProducts }) => {
           sku: matchedProduct.sku, 
         }));
       } else {
-        console.warn(`⚠️ No matching product found for "${value}"`);
+        console.warn(`No matching product found for "${value}"`);
         setFormData(prev => ({
           ...prev,
           sku: "", 
