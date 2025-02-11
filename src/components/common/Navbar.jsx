@@ -41,7 +41,7 @@ const Navigation = () => {
     <nav className="navbar">
       <div className="nav-container">
         <Link className="navbar-logo" to="/">
-          EcoCount IMS
+          <img src="/assets/logo.png" alt="EcoCount IMS Logo" className="nav-logo" />
         </Link>
 
         {userEmail && location.pathname !== "/" && (
