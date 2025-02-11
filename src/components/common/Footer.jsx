@@ -1,7 +1,8 @@
+import '../../styles/Footer.css';
 const Footer = () => {
   return (
-    <footer className="bg-light text-center text-lg-start">
-      <div className="text-center p-3">
+    <footer className="footer">
+      <div className="footer-content">
         &copy; {new Date().getFullYear()} EcoCount IMS. All rights reserved.
       </div>
     </footer>

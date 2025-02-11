@@ -1,11 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:ital,wght@0,200..800;1,200..800&family=Jersey+15&display=swap');
 
 :root {
   --primary-color: #1a472a;
-  --primary-light: #2E7D32;
   --secondary-color: #FFE4E1;
   --text-primary: #333333;
-  --text-secondary: #666666;
+  --text-secondary: white;
   --background-light: #ffffff;
   --background-dark: #f8f9fa;
   --error-color: #dc3545;
@@ -28,14 +27,15 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  color: #1a472a;
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Atkinson Hyperlegible Mono', serif;
   line-height: 1.5;
-  font-weight: 400;
-  color: var(--text-primary);
-  background-color: var(--background-light);
+  font-weight: 500;
+  /* color: var(--text-primary); */
+  /* background-color: var(--background-light); */
   min-height: 100vh;
   width: 100vw;
   overflow-x: hidden;
@@ -166,18 +166,18 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-light: #1a1a1a;
-    --background-dark: #242424;
-    --text-primary: #ffffff;
-    --text-secondary: #cccccc;
-  }
 
-  body {
+@media (prefers-color-scheme: dark) {
+  /* :root { */
+    /* --background-light: #1a1a1a; */
+    /* --background-dark: #242424; */
+    /* --text-primary: #ffffff; */
+    /* --text-secondary: #cccccc; */
+  /* } */
+
+  /* body {
     color-scheme: dark;
-  }
+  } */
 
   .card {
     background: var(--background-dark);

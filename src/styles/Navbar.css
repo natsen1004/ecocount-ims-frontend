@@ -1,5 +1,5 @@
 .navbar {
-  background-color: var(--background-light);
+  background-color: #1a472a;
   box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
@@ -19,11 +19,10 @@
 }
 
 .nav-logo {
-  height: 50px;  
+  height: 100px;  
   width: auto;   
   display: block;
 }
-
 
 .navbar-logo:hover {
   color: var(--primary-light);
@@ -49,7 +48,7 @@
 }
 
 .nav-link:hover {
-  color: var(--primary-light);
+  color: black;
 }
 
 .nav-link::after {
@@ -73,20 +72,19 @@
   gap: var(--spacing-md);
 }
 
-/* Notification Button Styles */
 .nav-right button {
   background: none;
   border: none;
   padding: var(--spacing-sm);
   position: relative;
   cursor: pointer;
+  margin-bottom: 15px;
 }
 
 .nav-right button:hover {
   transform: scale(1.1);
 }
 
-/* Notification Badge */
 .nav-right button span {
   position: absolute;
   top: -5px;
@@ -103,12 +101,12 @@
   padding: 0 var(--spacing-xs);
 }
 
-/* Logout Button */
 .logout-btn {
   background-color: transparent;
   color: var(--primary-color);
   border: 1px solid var(--primary-color);
   padding: 0.5rem 1rem;
+  margin-bottom: 15px;
   border-radius: 6px;
   font-weight: 500;
   transition: all 0.3s ease;
@@ -119,7 +117,6 @@
   color: white;
 }
 
-/* User Selection Styles */
 .user-selection {
   display: flex;
   align-items: center;
@@ -136,7 +133,7 @@
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
   border: 1px solid #ddd;
-  background-color: var(--background-light);
+  background-color: white;
   color: var(--text-primary);
   font-size: 0.9rem;
   cursor: pointer;
@@ -148,7 +145,6 @@
   box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.1);
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .nav-container {
     flex-direction: column;
@@ -176,30 +172,5 @@
 
   .user-selection select {
     width: 100%;
-  }
-}
-
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-  .navbar {
-    background-color: var(--background-dark);
-  }
-
-  .nav-link {
-    color: var(--text-secondary);
-  }
-
-  .user-selection select {
-    background-color: var(--background-dark);
-    border-color: #444;
-  }
-
-  .logout-btn {
-    border-color: var(--primary-light);
-    color: var(--primary-light);
-  }
-
-  .logout-btn:hover {
-    background-color: var(--primary-light);
   }
 }

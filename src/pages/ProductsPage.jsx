@@ -97,7 +97,7 @@ const ProductsPage = () => {
 
       {showAddProductForm && <AddProductForm addProduct={addProduct} loading={loading} />}
       {showRemoveProductForm && <RemoveProductForm products={products} removeProduct={removeProduct} loading={loading} />}
-      {showStockMovementForm && <StockMovementForm fetchProducts={fetchProducts} selectedUserId={userId} />} {/* ✅ Corrected */}
+      {showStockMovementForm && <StockMovementForm fetchProducts={fetchProducts} selectedUserId={userId} />} 
 
       <ProductList initialProducts={products} loading={loading} />
     </div>
