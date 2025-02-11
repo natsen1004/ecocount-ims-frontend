@@ -71,7 +71,9 @@ function AppContent() {
   return (
     <>
       <Navigation />
-      {userId ? <Notifications /> : <p>Please select an email to view notifications.</p>}
+      {userId && location.pathname === "/dashboard" && (
+        <p>Please select an email to view notifications.</p>
+      )}
       <div className="App">
         <Routes>
           <Route path="/" element={<LandingPage />} />

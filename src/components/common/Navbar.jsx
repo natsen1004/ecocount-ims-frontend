@@ -36,14 +36,20 @@ const Navigation = () => {
     setUserEmail(null);
     navigate("/");
   };
+  const isLandingPage = location.pathname === "/";
 
   return (
     <nav className="navbar">
       <div className="nav-container">
         <Link className="navbar-logo" to="/">
-          <img src="/assets/logo.png" alt="EcoCount IMS Logo" className="nav-logo" />
+          <img
+            src={`${import.meta.env.BASE_URL}assets/logo.png`}
+            alt="EcoCount IMS Logo"
+            className="nav-logo"
+          />
         </Link>
-
+  
+        {/* Show these links only if the user has selected an email and is not on the landing page */}
         {userEmail && location.pathname !== "/" && (
           <ul className="nav-links">
             <li className="nav-item">
@@ -63,45 +69,47 @@ const Navigation = () => {
             </li>
           </ul>
         )}
-
-        <div className="nav-right">
-          <div className="relative">
-            <button
-              onClick={toggleDropdown}
-              className="relative p-2 text-gray-700 hover:text-gray-900"
-            >
-              🔔
-              {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
-                  {unreadCount}
-                </span>
-              )}
+  
+        {/* Hide this section on Landing Page ("/"), show on all other pages */}
+        {location.pathname !== "/" && (
+          <div className="nav-right">
+            <div className="relative">
+              <button
+                onClick={toggleDropdown}
+                className="relative p-2 text-gray-700 hover:text-gray-900"
+              >
+                🔔
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white px-2 py-1 rounded-full text-xs">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+              <Notifications dropdownOpen={dropdownOpen} toggleDropdown={toggleDropdown} />
+            </div>
+  
+            <button className="logout-btn" onClick={handleLogout}>
+              Logout
             </button>
-
-            <Notifications dropdownOpen={dropdownOpen} toggleDropdown={toggleDropdown} />
+  
+            <div className="user-selection">
+              <label htmlFor="userEmail">Select Your Email: </label>
+              <select
+                id="userEmail"
+                value={userEmail || ""}
+                onChange={(e) => setUserEmail(e.target.value)}
+                className="text-black p-1"
+              >
+                <option value="">-- Select Email --</option>
+                {emailList.map((user) => (
+                  <option key={user.id} value={user.email}>
+                    {user.email}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-
-          <button className="logout-btn" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-
-        <div className="user-selection">
-          <label htmlFor="userEmail">Select Your Email: </label>
-          <select
-            id="userEmail"
-            value={userEmail || ""}
-            onChange={(e) => setUserEmail(e.target.value)}
-            className="text-black p-1"
-          >
-            <option value="">-- Select Email --</option>
-            {emailList.map((user) => (
-              <option key={user.id} value={user.email}>
-                {user.email}
-              </option>
-            ))}
-          </select>
-        </div>
+        )}
       </div>
     </nav>
   );
