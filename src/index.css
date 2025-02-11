@@ -84,14 +84,15 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: var(--primary-light);
+  background-color: #1a472a;
   color: white;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-top: 10px;
 }
 
 button:hover {
-  background-color: var(--primary-color);
+  background-color: #8FBC8F;
   transform: translateY(-1px);
 }
 

@@ -65,7 +65,7 @@
 }
 
 .auth-container button:hover {
-  background-color: var(--primary-light);
+  background-color: #8FBC8F;
   transform: translateY(-1px);
 }
 
@@ -76,7 +76,7 @@
 .toggle-text {
   margin-top: var(--spacing-md);
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: black;
 }
 
 .toggle-btn {
@@ -142,12 +142,11 @@
 }
 
 .form-check-label {
-  color: var(--text-secondary);
+  color: black;
   font-size: 0.9rem;
   cursor: pointer;
 }
 
-/* Error states */
 .error-message {
   color: var(--error-color);
   font-size: 0.85rem;
@@ -159,14 +158,14 @@
   border-color: var(--error-color) !important;
 }
 
-/* Loading state */
+
 .auth-container button:disabled {
   background-color: var(--text-secondary);
   cursor: not-allowed;
   transform: none;
 }
 
-/* Responsive design */
+
 @media (max-width: 768px) {
   .auth-container {
     width: 90%;
@@ -181,7 +180,6 @@
   }
 }
 
-/* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .auth-container {
     background-color: var(--background-dark);

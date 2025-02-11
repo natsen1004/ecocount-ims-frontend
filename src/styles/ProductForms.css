@@ -2,7 +2,7 @@
   max-width: 800px;
   margin: var(--spacing-xl) auto;
   padding: var(--spacing-xl);
-  background: black;
+  background: white;
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
 }
@@ -33,7 +33,7 @@
 .form-group label {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--text-secondary);
+  color: black;
 }
 
 .form-group input,
