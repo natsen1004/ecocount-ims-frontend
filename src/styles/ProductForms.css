@@ -177,18 +177,18 @@
   .form-group select,
   .form-group textarea {
     background-color: var(--background-dark);
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: black;
     color: var(--text-primary);
   }
 
   .form-group input::placeholder,
   .form-group select::placeholder,
   .form-group textarea::placeholder {
-    color: var(--text-secondary);
+    color: black;
   }
 
   .form-group label {
-    color: var(--text-secondary);
+    color: black;
   }
 
   .success-message {
